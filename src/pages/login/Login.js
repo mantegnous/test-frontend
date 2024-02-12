@@ -13,6 +13,7 @@ import {handleApiError} from "../../utilities/helpers";
 import useError from "../../hooks/useError";
 import Logo from "../../components/Logo";
 import useUser from "../../hooks/useUser";
+import useAlert from '../../hooks/useAlert'
 
 const useStyles = createUseStyles(theme => ({
     formTitle: {
@@ -54,6 +55,7 @@ const Login = () => {
     const showError = useError();
     const {createUser} = useUser();
     const [showPassword, setShowPassword] = useState(false);
+    const { triggerAlert } = useAlert();
 
     const methods = useForm({
         shouldUnregister: false,
@@ -81,6 +83,11 @@ const Login = () => {
                 handleGeneralError: showError,
                 handleFormError: setError
             })
+            triggerAlert({
+                title: 'Error',
+                description: 'An error has occurred. Please check your credentials',
+                severity: 'error',
+            });
         }
     }
 
