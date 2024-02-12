@@ -247,38 +247,42 @@ const Homepage = () => {
             <Row>
                 <Column start={2} span={10}>
                     <DragDropContext onDragEnd={onDragEnd}>
-                        {filteredTasks && Object.keys(filteredTasks)?.map((date) =>
-                            <Droppable key={date} droppableId={`${date}`} isDropDisabled={date === "Expired"}>
-                                {(provided, snapshot) => (
-                                    <div ref={provided.innerRef} {...provided.droppableProps}>
+                        {filteredTasks && Object.keys(filteredTasks)?.map((date) => (
+                            <Droppable key={date} droppableId={`${date}`} >
+                                {(droppableProvided, droppableSnapshot) => (
+                                    <div ref={droppableProvided.innerRef} {...droppableProvided.droppableProps}>
                                         <div className={classes.section}>
                                             <div key={date} className={classes.sectionHeading}>
                                                 {dateRenderer(date)}
                                             </div>
-                                            {filteredTasks[date]?.map((task, index) =>
+                                            {filteredTasks[date]?.map((task, index) => (
                                                 <Draggable key={task.id} draggableId={`item-${task.id}`} index={index}>
-                                                    {(provided, snapshot) => (
-                                                        <Task task={task}
-                                                              index={index}
-                                                              isLast={(tasks[date]?.length - 1 === index)}
-                                                              ref={provided.innerRef}
-                                                              onDeleteCb={onDeleteTask}
-                                                              onUpdateCb={onEditTask}
-                                                              onEditCb={() =>{
-                                                                  setOpenedTask(task)
-                                                                  setShowEditModal(true)
-                                                              }}
-                                                              draggableProps={provided.draggableProps}
-                                                              dragHandleProps={provided.dragHandleProps}
-                                                        />
+                                                    {(draggableProvided, draggableSnapshot) => (
+                                                            <Task
+                                                                ref={draggableProvided.innerRef}
+                                                                draggableProps={draggableProvided.draggableProps}
+                                                                dragHandleProps={draggableProvided.dragHandleProps}
+                                                                task={task}
+                                                                index={index}
+                                                                isLast={tasks[date]?.length - 1 === index}
+                                                                onDeleteCb={onDeleteTask}
+                                                                onUpdateCb={onEditTask}
+                                                                onEditCb={() => {
+                                                                    setOpenedTask(task);
+                                                                    setShowEditModal(true);
+                                                                }}
+                                                            />
                                                     )}
                                                 </Draggable>
-                                            )}
+                                            ))}
+                                            {droppableProvided.placeholder}
                                         </div>
-                                    </div>)}
+                                    </div>
+                                )}
                             </Droppable>
-                        )}
+                        ))}
                     </DragDropContext>
+
                 </Column>
             </Row>
         </Container>
