@@ -22,6 +22,7 @@ import FilterBar from "./filter-bar/FilterBar";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import EditTaskModal from "./EditTaskModal";
 import { TASK_MODEL } from '../../models'
+import { toast } from 'react-toastify'
 
 const useStyles = createUseStyles(theme => ({
     taskBodyRoot: {
@@ -53,7 +54,7 @@ const Homepage = () => {
     const [priority, setPriority] = useState(false);
     const [openedTask, setOpenedTask] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
-
+    const [deletedTasks, setDeletedTasks] = useState([]);
     const classes = useStyles();
 
     const {width} = useWindowSize()
@@ -133,17 +134,51 @@ const Homepage = () => {
      * @param index
      * @returns {Promise<void>}
      */
-    const onDeleteTask = async (task,index) => {
+    const onDeleteTask = async (task, index) => {
         try {
             await TasksAPI.deleteTask(task[TASK_MODEL.id]);
-            onDeleteItem(task[TASK_MODEL.date],index)
+            onDeleteItem(task[TASK_MODEL.date], index);
+
+            setDeletedTasks([...deletedTasks, { task, index, date: task[TASK_MODEL.date] }]);
+
+            toast(`Task deleted. Click the toast to cancel in 5 seconds.`, {
+                onClick: () => performUndo(task[TASK_MODEL.id])
+            });
+
         } catch (error) {
             handleApiError({
                 error,
                 handleGeneralError: showError
-            })
+            });
         }
-    }
+    };
+
+    const performUndo = async (taskId) => {
+        try {
+            await TasksAPI.undo(taskId);
+            toast.dismiss();
+        } catch (error) {
+            handleApiError({
+                error,
+                handleGeneralError: showError
+            });
+        }
+    };
+
+    useEffect(() => {
+        const handleKeyDown = (event) => {
+            if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+                if (deletedTasks.length > 0) {
+                    const lastDeletedTask = deletedTasks[deletedTasks.length - 1];
+                    performUndo(lastDeletedTask.task[TASK_MODEL.id]);
+                }
+            }
+        };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [deletedTasks]);
+
     const onDeleteItem = (key,index) => {
         let newTasks = tasks;
         //remember that key is => date

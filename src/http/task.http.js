@@ -21,6 +21,10 @@ const TasksAPI = {
     orderTasks:(data) => {
         const url = '/todos/order'
         return axios.post(url,{todos:[...data]})
+    },
+    undo:(id) => {
+        const url = `/todos/${id}/restore`
+        return axios.post(url)
     }
 }
 
