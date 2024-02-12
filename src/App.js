@@ -4,6 +4,7 @@ import { theme } from './theme'
 import AlertProvider from "./context/AlertProvider";
 import UserProvider from "./context/UserProvider";
 import router from "./routes";
+import './index.css';
 const App = () => {
     return <ThemeProvider theme={theme({ name: 'light' })}>
         <AlertProvider>

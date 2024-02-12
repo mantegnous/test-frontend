@@ -5,6 +5,8 @@ import Column from "../../components/Column";
 import TasksAPI from "../../http/task.http";
 import useError from "../../hooks/useError";
 import {useEffect, useMemo, useState} from "react";
+import { CSSTransition } from 'react-transition-group';
+
 import {
     dateIsInRange,
     dateRenderer,
@@ -155,8 +157,10 @@ const Homepage = () => {
 
     const performUndo = async (taskId) => {
         try {
-            await TasksAPI.undo(taskId);
             toast.dismiss();
+            const restoredTask = await TasksAPI.undo(taskId);
+            console.log('insertRestoredTask', restoredTask)
+            insertRestoredTask(restoredTask.data);
         } catch (error) {
             handleApiError({
                 error,
@@ -164,6 +168,23 @@ const Homepage = () => {
             });
         }
     };
+
+    const insertRestoredTask = (task) => {
+        let newTasks = { ...tasks };
+        const taskDate = task.date;
+
+        if (newTasks.hasOwnProperty(taskDate)) {
+
+            let position = Math.max(task.position - 1, 0);
+            newTasks[taskDate].splice(position, 0, task);
+        } else {
+
+            newTasks[taskDate] = [task];
+        }
+
+        setTasks(newTasks);
+    };
+
 
     useEffect(() => {
         const handleKeyDown = (event) => {
@@ -293,6 +314,11 @@ const Homepage = () => {
                                             {filteredTasks[date]?.map((task, index) => (
                                                 <Draggable key={task.id} draggableId={`item-${task.id}`} index={index}>
                                                     {(draggableProvided, draggableSnapshot) => (
+                                                        <CSSTransition
+                                                            key={task.id}
+                                                            timeout={500}
+                                                            classNames="task-transition"
+                                                        >
                                                             <Task
                                                                 ref={draggableProvided.innerRef}
                                                                 draggableProps={draggableProvided.draggableProps}
@@ -307,9 +333,11 @@ const Homepage = () => {
                                                                     setShowEditModal(true);
                                                                 }}
                                                             />
+                                                        </CSSTransition>
                                                     )}
                                                 </Draggable>
                                             ))}
+
                                             {droppableProvided.placeholder}
                                         </div>
                                     </div>

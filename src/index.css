@@ -11,3 +11,20 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.task-transition-enter {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+.task-transition-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 500ms, transform 500ms;
+}
+.task-transition-exit {
+  opacity: 1;
+}
+.task-transition-exit-active {
+  opacity: 0;
+  transition: opacity 500ms;
+}
