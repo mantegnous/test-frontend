@@ -21,6 +21,7 @@ import TodoInputBar from "./todo-input-bar/TodoInputBar";
 import FilterBar from "./filter-bar/FilterBar";
 import {useWindowSize} from "../../hooks/useWindowSize";
 import EditTaskModal from "./EditTaskModal";
+import { TASK_MODEL } from '../../models'
 
 const useStyles = createUseStyles(theme => ({
     taskBodyRoot: {
